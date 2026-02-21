@@ -1,58 +1,52 @@
 #!/usr/bin/env bash
-# PureLand Greeting (text glow) - WSL
-# - chữ màu + hiệu ứng shimmer nhẹ
-# - không phụ thuộc gói ngoài (có perl thì mượt hơn)
-
+# PureLand Greeting (bright, cheerful, real ANSI escape)
 [[ -t 1 ]] || exit 0
 
-# ---- Colors ----
-RST="\033[0m"
-DIM="\033[2m"
-BOLD="\033[1m"
+ESC=$'\033'
+RST="${ESC}[0m"
+BOLD="${ESC}[1m"
+DIM="${ESC}[2m"
 
-GOLD="\033[38;5;220m"
-PINK="\033[38;5;213m"
-VIO="\033[38;5;141m"
-SKY="\033[38;5;117m"
-MINT="\033[38;5;121m"
-GRAY="\033[38;5;245m"
-WHITE="\033[38;5;255m"
+# Truecolor (tươi vui, pastel)
+SUN="${ESC}[38;2;255;215;120m"   # vàng nắng
+PINK="${ESC}[38;2;255;150;200m"  # hồng sen
+SKY="${ESC}[38;2;130;210;255m"   # xanh trời
+MINT="${ESC}[38;2;140;255;200m"  # xanh ngọc
+LAV="${ESC}[38;2;200;170;255m"   # tím nhạt
+GRAY="${ESC}[38;2;180;180;180m"
+WHT="${ESC}[38;2;245;245;245m"
 
-# ---- micro-sleep ----
 sleep_s() { perl -e "select(undef,undef,undef,$1)"; } 2>/dev/null || sleep_s(){ sleep "$1"; }
 
-# ---- center ----
 center() {
   local s="$1"
   local cols="${COLUMNS:-80}"
+  # độ dài text có màu sẽ tính sai vì có ESC; chấp nhận (đẹp là chính)
   local len="${#s}"
   local pad=$(( (cols - len) / 2 ))
   (( pad < 0 )) && pad=0
   printf "%*s%s\n" "$pad" "" "$s"
 }
 
-print_block() {
-  local accent="$1" halo="$2"
+frame() {
+  local A="$1" B="$2" C="$3"
   clear
-  echo ""
-  center "${halo}${BOLD}🌼  Nam Mô A Di Đà Phật  🌼${RST}"
-  center "${accent}${BOLD}✨  Hào quang vô lượng chiếu tâm  ✨${RST}"
-  center "${DIM}${GRAY}----------------------------------------${RST}"
-  echo ""
-  center "${SKY}Nam mô A di đa bà dạ${RST}   ${DIM}${GRAY}# 南無阿彌多婆夜${RST}"
-  center "${SKY}Đa tha dà đa dạ${RST}       ${DIM}${GRAY}# 多他伽多夜${RST}"
-  center "${SKY}Ta bà ha${RST}              ${DIM}${GRAY}# 娑婆訶${RST}"
-  echo ""
+  printf "\n"
+  center "${DIM}${A}✦✧✦${RST}  ${BOLD}${SUN}🌼  Nam Mô A Di Đà Phật  🌼${RST}  ${DIM}${A}✦✧✦${RST}"
+  center "${BOLD}${B}✨  Hào quang vô lượng chiếu tâm  ✨${RST}"
+  center "${DIM}${GRAY}────────────────────────────────────────${RST}"
+  printf "\n"
+  center "${C}Nam mô A di đa bà dạ${RST}   ${DIM}${GRAY}# 南無阿彌多婆夜${RST}"
+  center "${C}Đa tha dà đa dạ${RST}       ${DIM}${GRAY}# 多他伽多夜${RST}"
+  center "${C}Ta bà ha${RST}              ${DIM}${GRAY}# 娑婆訶${RST}"
+  printf "\n"
   center "${DIM}${GRAY}WSL · an trú · tĩnh sáng · làm việc như tu tập${RST}"
-  echo ""
+  printf "\n"
 }
 
-# ---- shimmer frames (text-only glow) ----
-# đổi màu nhấn qua vài frame để tạo cảm giác "hào quang"
-print_block "$PINK" "$GOLD"; sleep_s 0.18
-print_block "$VIO"  "$GOLD"; sleep_s 0.18
-print_block "$SKY"  "$GOLD"; sleep_s 0.18
-print_block "$MINT" "$GOLD"; sleep_s 0.18
-print_block "$PINK" "$GOLD"; sleep_s 0.18
-
-# giữ lại frame cuối để user làm việc (không clear nữa)
+# shimmer (đổi sắc nhẹ)
+frame "$LAV" "$PINK" "$SKY";  sleep_s 0.18
+frame "$SKY" "$MINT" "$PINK"; sleep_s 0.18
+frame "$MINT" "$LAV" "$SKY";  sleep_s 0.18
+frame "$PINK" "$SKY" "$MINT"; sleep_s 0.18
+frame "$LAV" "$PINK" "$SKY";  sleep_s 0.18
