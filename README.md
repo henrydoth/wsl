@@ -1,104 +1,196 @@
-# 🌼 WSL – w_in_home
+# 🧘 WSL – Liêm Environment Setup (Professional Build)
 
-## Phong cách Liêm 2.0
+## 📌 Tổng kết buổi thiết lập hệ thống
 
-Cấu hình giao diện WSL mang phong cách thiền – tối giản – kỹ thuật.
+Hôm nay chúng ta đã hoàn thành việc xây dựng một môi trường làm việc chuyên nghiệp cho:
+
+- WSL Ubuntu 24.04
+- GitHub SSH authentication
+- R Linux + R Windows song song
+- Prompt tùy biến theo phong cách cá nhân
+- Function tự động commit/push
+- Auto SSH agent
+- Workspace chuẩn hóa
+
+Đây không còn là môi trường mặc định nữa — mà là một môi trường dev được cá nhân hóa, sạch, ổn định và có hệ thống.
 
 ------
 
-# 🎯 Mục tiêu
+# 🏗 1. Cấu trúc môi trường hiện tại
 
-Khi mở WSL sẽ hiển thị:
+## 🖥 Windows
+
+- RStudio Desktop (R 4.5.2 ucrt)
+
+- PowerShell
+
+- Workspace chính:
+
+  ```
+  D:/GitHub/wsl
+  ```
+
+## 🐧 WSL
+
+- Ubuntu 24.04
+- User: `wsl_l`
+- R Linux: 4.3.3
+- Git cấu hình qua SSH
+- Prompt tùy biến Liêm 2.x
+- SSH agent tự động khởi động
+
+------
+
+# 🔐 2. GitHub Authentication – Chuyển từ HTTPS sang SSH
+
+## Trước đây
+
+- Dùng HTTPS
+
+- GitHub không còn cho password authentication
+
+- Push bị lỗi:
+
+  ```
+  Invalid username or token
+  ```
+
+## Đã làm
+
+### 1️⃣ Tạo SSH key
 
 ```
-🌼 Nam Mô A Di Đà Phật
-✨ Hào quang vô lượng chiếu tâm
---------------------------------
+ssh-keygen -t ed25519 -C "liem20k@gmail.com"
+```
 
-11:20:01  514/11919MB [R 4.5.2] o_hanh_iem@liem-pchome ~/GitHub/wsl (main)
+### 2️⃣ Add key vào GitHub
+
+Settings → SSH and GPG keys → New SSH key
+
+### 3️⃣ Test
+
+```
+ssh -T git@github.com
+```
+
+Thành công:
+
+```
+Hi henrydoth!
+```
+
+### 4️⃣ Đổi remote
+
+```
+git remote set-url origin git@github.com:henrydoth/wsl.git
+```
+
+------
+
+## ✅ Kết quả
+
+- Không cần nhập password
+- Push/pull hoạt động tự động
+- Môi trường chuyên nghiệp
+
+------
+
+# ⚙ 3. Tùy biến Bash Prompt
+
+## Prompt hiển thị:
+
+```
+09:20:37 532/11919MB [R 4.3.3] wsl_l@liem-pchome /mnt/d/GitHub/wsl (main)
 ❯
 ```
 
-Bao gồm:
+### Bao gồm:
 
-- 🕒 Giờ hệ thống (HH:MM:SS)
-- 💾 RAM used/total (MB)
-- 📦 R version (chỉ hiện khi vào project R)
-- 🎨 Git branch màu vàng
-- 🌟 Hào quang mờ
-- Prompt 2 dòng rõ ràng
-
-------
-
-# 📁 Cấu trúc thư mục
-
-```
-wsl/
- └── w_in_home/
-      ├── bashrc_liem
-      ├── aliases_liem.sh
-      ├── install.sh
-      └── README.md
-```
+| Thành phần        | Ý nghĩa                      |
+| ----------------- | ---------------------------- |
+| 09:20:37          | Thời gian                    |
+| 532/11919MB       | RAM used/total               |
+| [R 4.3.3]         | Chỉ hiển thị khi ở R project |
+| wsl_l@liem-pchome | user@host                    |
+| path              | thư mục hiện tại             |
+| (main)            | git branch                   |
 
 ------
 
-# 🚀 CÀI ĐẶT TỪ ĐẦU
+# 🔁 4. Auto SSH Agent
 
-## 1️⃣ Mở WSL
+Thêm vào `.bashrc`:
 
-Trong PowerShell:
+- Tự khởi động ssh-agent nếu chưa có
+- Tự add id_ed25519 nếu chưa add
+
+Kết quả:
+
+- Mở terminal là `git push` chạy ngay
+- Không phải nhập lại password
+
+------
+
+# 🚀 5. Function gp()
+
+Thay vì dùng alias git rời rạc, ta tạo function:
 
 ```
-wsl
+gp "message"
+```
+
+Thực hiện:
+
+- git add -A
+- git commit (timestamp + user)
+- git push
+
+Ví dụ commit:
+
+```
+2026-02-21 09:12 | wsl_l | update prompt config
+```
+
+### Ưu điểm
+
+- Không commit rỗng
+- Có timestamp
+- Có user
+- Không cần nhớ 3 lệnh
+
+------
+
+# ⚠ 6. Lưu ý quan trọng (RStudio & CRLF)
+
+Đây là phần quan trọng nhất trong buổi hôm nay.
+
+## ❌ Vấn đề
+
+Khi chỉnh `.bashrc` bằng RStudio Windows:
+
+File được lưu với:
+
+```
+CRLF
+```
+
+Trong Linux, bash cần:
+
+```
+LF
+```
+
+Lỗi xảy ra:
+
+```
+syntax error near unexpected token $'{\r''
 ```
 
 ------
 
-## 2️⃣ Vào thư mục cấu hình
+## ✅ Cách sửa
 
-```
-cd /mnt/d/GitHub/wsl/w_in_home
-```
-
-------
-
-## 3️⃣ Chạy script cài đặt
-
-```
-bash install.sh
-```
-
-Script sẽ:
-
-- Backup ~/.bashrc thành ~/.bashrc.bak_liem
-- Copy bashrc_liem vào ~/.bashrc
-- Thêm aliases
-- Reload cấu hình
-
-------
-
-## 4️⃣ Mở lại WSL
-
-Thoát:
-
-```
-exit
-```
-
-Mở lại:
-
-```
-wsl
-```
-
-------
-
-# 🔧 Nếu gặp lỗi ký tự lạ []
-
-Do CRLF của Windows.
-
-Chạy:
+Trong WSL:
 
 ```
 sed -i 's/\r$//' ~/.bashrc
@@ -106,371 +198,146 @@ sed -i 's/\r$//' ~/.bashrc
 
 ------
 
-# 🧠 Nhận diện Project R
+## 📌 Nguyên tắc vàng
 
-R version chỉ hiện khi trong thư mục có:
+Nếu chỉnh file Linux bằng Windows:
 
-- *.Rproj
-- renv.lock
-- DESCRIPTION
-
-Dò tối đa 6 cấp thư mục cha.
-
-------
-
-# 🎨 Git branch
-
-Chỉ hiện khi đang ở trong git repository.
-
-Màu: Vàng.
-
-------
-
-# ⚙ Alias có sẵn
-
-- `ll` → ls -lah
-- `np` → mở Notepad Windows
-- `ex` → mở Explorer
-- `wslhome` → về thư mục cấu hình
-
-------
-
-# 🔄 Cập nhật cấu hình sau này
-
-Sau khi chỉnh `bashrc_liem`:
+1. Line Endings = LF
+2. Encoding = UTF-8
+3. Sau khi lưu → luôn chạy:
 
 ```
-bash install.sh
+sed -i 's/\r$//' ~/.bashrc
 ```
 
 ------
 
-# 🧘 Triết lý thiết kế
+# 🔄 7. Phân biệt môi trường
 
-Phong cách:
-
-- Tối giản
-- Không rườm rà
-- Hiển thị thông tin cần thiết
-- Thiền nhưng vẫn Dev
-- Nhẹ – không ảnh hưởng hiệu suất
-
-------
-
-# 📦 Backup
-
-File backup gốc:
-
-```
-~/.bashrc.bak_liem
-```
-
-Khôi phục nếu cần:
-
-```
-cp ~/.bashrc.bak_liem ~/.bashrc
-```
+| Lệnh             | Chạy ở đâu      |
+| ---------------- | --------------- |
+| wsl              | PowerShell      |
+| source ~/.bashrc | WSL             |
+| git push         | WSL             |
+| getwd()          | R               |
+| file.edit()      | RStudio Windows |
 
 ------
 
-# 🏁 Hoàn tất
+## Sai phổ biến hôm nay
 
-Anh đã có:
+Chạy `wsl` bên trong WSL:
 
-- Loading thiền
-- Prompt kỹ thuật
-- R aware
-- Git aware
-- RAM aware
-- Time aware
+```
+Command 'wsl' not found
+```
+
+Vì `wsl` là lệnh Windows, không phải Linux.
 
 ------
 
-Nếu anh muốn bản 3.0:
+# 🧠 8. Kiến thức học được hôm nay
 
-- Hiển thị Python venv
-- Hiển thị Conda
-- Hiển thị Docker context
-- Hiển thị CPU load
-- Hiển thị battery
-- Loading animation mượt
+### ✔ Git SSH setup
 
-Nói tôi nâng cấp tiếp 😄
+### ✔ Remote change
 
-# 1️⃣ Linux là gì?
+### ✔ CRLF vs LF
 
-Linux gồm 3 phần chính:
+### ✔ Bash prompt customization
 
-1. 🧠 Kernel (nhân hệ điều hành)
-2. 📁 File system
-3. 🖥 Shell (bash)
+### ✔ Function vs alias
 
-Trong WSL:
+### ✔ ssh-agent lifecycle
 
-- Windows = hệ điều hành chính
-- WSL = Linux chạy bên trong
+### ✔ WSL user management
+
+### ✔ .bashrc cấu trúc
+
+### ✔ Interactive shell detection
+
+### ✔ Workspace auto jump
 
 ------
 
-# 2️⃣ Cấu trúc thư mục Linux
+# 🧘 9. Triết lý hệ thống
 
-Khác Windows.
+Môi trường dev không chỉ là tool.
 
-Windows:
+Nó là:
+
+- Trạng thái tinh thần
+- Nhịp làm việc
+- Sự rõ ràng
+- Tính nhất quán
+
+Prompt hiển thị RAM, R version, branch…
+ Không phải để “đẹp”
+ Mà để luôn ý thức mình đang ở đâu.
+
+------
+
+# 📁 10. Cấu trúc làm việc chuẩn
 
 ```
-C:\Users\...
+D:/GitHub/
+    ├── wsl/
+    ├── dtcs25_sstt/
+    ├── nejm/
+    ├── chu_vang_sanh/
 ```
 
-Linux:
+WSL mount:
 
 ```
-/
-├── home
-├── etc
-├── usr
-├── var
-├── bin
+/mnt/d/GitHub/
 ```
 
 ------
 
-## 📂 Thư mục quan trọng cho anh
+# 🔥 11. Checklist sau mỗi thay đổi hệ thống
 
-### 🏠 Home của anh:
-
-```
-/home/o_hanh_iem
-```
-
-Shortcut:
-
-```
-~
-```
+-  source ~/.bashrc
+-  git status
+-  ssh-add -l
+-  test gp
+-  kiểm tra LF nếu có lỗi
 
 ------
 
-### 💽 Ổ Windows trong WSL:
+# 🏁 12. Trạng thái hiện tại
 
-```
-/mnt/c
-/mnt/d
-```
+Bạn đang có:
 
-Ví dụ:
+- WSL chuẩn
+- SSH chuẩn
+- Prompt cá nhân hóa
+- Function commit thông minh
+- Workspace chuẩn
+- Không lỗi CRLF
+- Không password GitHub
+- Hệ thống sạch
 
-```
-/mnt/d/GitHub
-```
-
-------
-
-# 3️⃣ Lệnh cơ bản
-
-## 📁 Xem file
-
-```
-ls
-ls -lah
-```
+Đây là một môi trường dev thực thụ.
 
 ------
 
-## 📂 Di chuyển thư mục
+# 🌿 Kết luận
 
-```
-cd folder
-cd ..
-cd ~
-```
+Hôm nay không chỉ là setup.
 
-------
+Đây là:
 
-## 📄 Xem nội dung file
+- Luyện tư duy hệ thống
+- Làm chủ môi trường
+- Hiểu sâu Linux
+- Hiểu rõ Git
+- Phân biệt Windows vs WSL
 
-```
-cat file.txt
-less file.txt
-```
+Và quan trọng nhất:
 
-------
-
-## ✏ Chỉnh sửa file
-
-```
-nano file.txt
-```
-
-Hoặc:
-
-```
-notepad.exe file.txt
-```
+Bạn không còn dùng máy theo cách mặc định nữa.
+ Bạn đang điều khiển nó.
 
 ------
 
-## 📦 Cài phần mềm
-
-```
-sudo apt update
-sudo apt install package_name
-```
-
-------
-
-## 🔍 Tìm kiếm
-
-```
-grep "text" file.txt
-```
-
-------
-
-## ⚙ Quyền file
-
-```
-chmod +x script.sh
-```
-
-------
-
-# 4️⃣ Khái niệm quan trọng
-
-## 🔹 File không có đuôi bắt buộc
-
-Windows:
-
-```
-file.txt
-```
-
-Linux:
-
-```
-file
-```
-
-Không cần .txt.
-
-------
-
-## 🔹 Mọi thứ là file
-
-- File
-- Thư mục
-- Process
-- Device
-- Memory
-
-------
-
-## 🔹 Root (admin)
-
-```
-sudo command
-```
-
-------
-
-# 5️⃣ Bash là gì?
-
-Bash là shell.
-
-Nó đọc file:
-
-```
-~/.bashrc
-```
-
-Mỗi lần mở WSL → bash đọc file này.
-
-Anh đã custom rồi 👍
-
-------
-
-# 6️⃣ Process trong Linux
-
-Xem process:
-
-```
-top
-```
-
-Xem memory:
-
-```
-free -h
-```
-
-------
-
-# 7️⃣ Hệ thống quyền
-
-Linux có:
-
-```
-r w x
-```
-
-Ví dụ:
-
-```
--rwxr-xr-x
-```
-
-------
-
-# 8️⃣ Biến môi trường
-
-Xem:
-
-```
-echo $PATH
-```
-
-------
-
-# 9️⃣ Pipe (rất quan trọng)
-
-Ví dụ:
-
-```
-ls -lah | grep ".R"
-```
-
-Pipe = chuyển output sang lệnh khác.
-
-------
-
-# 🔟 Script cơ bản
-
-Tạo file:
-
-```
-script.sh
-```
-
-Nội dung:
-
-```
-#!/bin/bash
-echo "Hello"
-```
-
-Chạy:
-
-```
-chmod +x script.sh
-./script.sh
-```
-
-------
-
-# 🎯 Với anh nên tập trung 5 thứ
-
-1. File system
-2. Git trong Linux
-3. grep / sed / awk
-4. bash scripting
-5. quyền file
