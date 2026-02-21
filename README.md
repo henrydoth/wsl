@@ -341,3 +341,22 @@ Bạn không còn dùng máy theo cách mặc định nữa.
 
 ------
 
+# 🌼 WSL – PureLand Terminal by Liêm
+
+> 🌼 Nam Mô A Di Đà Phật  
+> ✨ Hào quang vô lượng chiếu tâm  
+> WSL · an trú · tĩnh sáng · làm việc như tu tập
+
+Biến WSL thành:
+- 🌈 Terminal có **Chú Vãng Sinh màu sắc**
+- 🎮 Linux playground: cowsay, tàu lửa, tetris, matrix…
+- 🔁 Đồng bộ GitHub – máy nào cũng dùng lại được
+
+---
+
+# 🚀 1. Cài PureLand Greeting
+
+## Tạo symlink chung
+
+```bash
+ln -sfn /mnt/d/GitHub/wsl ~/wsl
